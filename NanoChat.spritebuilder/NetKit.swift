@@ -25,24 +25,19 @@ enum AdvertisingStatus
 
 public protocol NetKitDelegate {
     
+    // Not needed right now, discovery happens automagically. All peers are auto-conencted
     func peerDiscovered(peerIDString:String)
     func peerRequestFrom(peerIDString:String)
     
     func peerConnecting(peerIDString:String)
     func peerConnected(peerIDString:String)
     func peerDisconnected(peerIDString:String)
-    
-//    func connecting(myPeerID: MCPeerID, toPeer peer: MCPeerID)
-//    func connected(myPeerID: MCPeerID, toPeer peer: MCPeerID)
-//    func disconnected(myPeerID: MCPeerID, fromPeer peer: MCPeerID)
-//    func receivedData(myPeerID: MCPeerID, data: NSData, fromPeer peer: MCPeerID)
-//    func finishReceivingResource(myPeerID: MCPeerID, resourceName: String, fromPeer peer: MCPeerID, atURL localURL: NSURL)
 }
 
 class NetKit: NSObject, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowserDelegate, MCSessionDelegate
 {
-    var advertiser:MCNearbyServiceAdvertiser?
-    var browser:MCNearbyServiceBrowser?
+    var serviceAdvertiser:MCNearbyServiceAdvertiser?
+    var serviceBrowser:MCNearbyServiceBrowser?
     var session:MCSession
     var myPeerID:MCPeerID
     var browsingStatus:BrowsingStatus
@@ -73,8 +68,56 @@ class NetKit: NSObject, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowse
     }
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Information
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    func peerAlreadyConnected(peerID:MCPeerID) -> Bool
+    {
+        var alreadyConnected = false
+        
+        for connectedPeer:MCPeerID in connectedPeerIDs()
+        {
+            if (connectedPeer == peerID)
+            {
+                alreadyConnected = true
+                break
+            }
+        }
+        
+        return alreadyConnected
+    }
+    
+    func connectedPeerIDs() -> [MCPeerID]
+    {
+        var peerIDs = [MCPeerID]()
+        
+        for peerID in session.connectedPeers
+        {
+            peerIDs.append(peerID as MCPeerID)
+        }
+        
+        return peerIDs
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     // Service Control
     ////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    func disconnect()
+    {
+        if advertisingStatus == .advertiser_advertising
+        {
+            stopAdvertising()
+        }
+        
+        if browsingStatus == .browser_browsing
+        {
+            stopBrowsing()
+        }
+        
+        session.delegate = nil
+        session.disconnect()
+    }
     
     //////////////////////////////////////////////////
     // Transceiving Control (Simulatneously Advertise and Browse)
@@ -82,24 +125,32 @@ class NetKit: NSObject, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowse
     
     func startTransceiving(#serviceType:String)
     {
-        startAdvertising(serviceType)
-        startBrowsing(serviceType)
+        println("Start Transceiving")
+        
+        startAdvertising(serviceType:serviceType)
+        startBrowsing(serviceType:serviceType)
     }
     
     func resumeTransceiving()
     {
+        println("Resume Transceiving")
+        
         resumeAdvertising()
         resumeBrowsing()
     }
     
     func pauseTransceiving()
     {
+        println("Pause Transceiving")
+        
         pauseAdvertising()
         pauseBrowsing()
     }
     
     func stopTransceiving()
     {
+        println("Stop Transceiving")
+        
         stopAdvertising()
         stopBrowsing()
     }
@@ -108,66 +159,82 @@ class NetKit: NSObject, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowse
     // Advertising Control
     //////////////////////////////////////////////////
     
-    func startAdvertising(serviceType:String)
+    func startAdvertising(#serviceType:String)
     {
-        advertiser = MCNearbyServiceAdvertiser(peer:myPeerID, discoveryInfo:nil, serviceType:serviceType)
-        advertiser?.delegate = self;
+        println("Start Advertising")
+        
+        serviceAdvertiser = MCNearbyServiceAdvertiser(peer:myPeerID, discoveryInfo:nil, serviceType:serviceType)
+        serviceAdvertiser?.delegate = self;
         
         advertisingStatus = .advertiser_advertising
-        advertiser?.startAdvertisingPeer()
+        serviceAdvertiser?.startAdvertisingPeer()
     }
     
     func resumeAdvertising()
     {
+        println("Resume Advertising")
+        
         advertisingStatus = .advertiser_advertising
-        advertiser?.startAdvertisingPeer()
+        serviceAdvertiser?.startAdvertisingPeer()
     }
     
     func pauseAdvertising()
     {
+        println("Pause Advertising")
+        
         advertisingStatus = .advertiser_stopped
-        advertiser?.stopAdvertisingPeer()
+        serviceAdvertiser?.stopAdvertisingPeer()
     }
     
     func stopAdvertising()
     {
-        advertiser?.delegate = nil
+        println("Stop Advertising")
+        
+        serviceAdvertiser?.delegate = nil
         
         advertisingStatus = .advertiser_stopped
-        advertiser?.stopAdvertisingPeer()
+        serviceAdvertiser?.stopAdvertisingPeer()
     }
     
     //////////////////////////////////////////////////
     // Browsing Control
     //////////////////////////////////////////////////
     
-    func startBrowsing(serviceType:String)
+    func startBrowsing(#serviceType:String)
     {
-        browser = MCNearbyServiceBrowser(peer:myPeerID, serviceType:serviceType)
-        browser?.delegate = self;
+        println("Start Browsing")
+        
+        serviceBrowser = MCNearbyServiceBrowser(peer:myPeerID, serviceType:serviceType)
+        serviceBrowser?.delegate = self;
         
         browsingStatus = .browser_browsing
-        browser?.startBrowsingForPeers()
+        serviceBrowser?.startBrowsingForPeers()
     }
     
     func resumeBrowsing()
     {
+        println("Resume Browsing")
+        
         browsingStatus = .browser_browsing
-        browser?.startBrowsingForPeers()
+        serviceBrowser?.startBrowsingForPeers()
     }
     
     func pauseBrowsing()
     {
+        println("Pause Browsing")
+        
         browsingStatus = .browser_stopped
-        browser?.stopBrowsingForPeers()
+        serviceBrowser?.stopBrowsingForPeers()
     }
     
     func stopBrowsing()
     {
-        browser?.delegate = nil
+        println("Stop Browsing")
+        
+        serviceBrowser?.delegate = nil
         
         browsingStatus = .browser_stopped
-        browser?.stopBrowsingForPeers()
+        serviceBrowser?.stopBrowsingForPeers()
     }
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -201,6 +268,12 @@ class NetKit: NSObject, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowse
     func advertiser(advertiser: MCNearbyServiceAdvertiser!, didReceiveInvitationFromPeer peerID: MCPeerID!, withContext context: NSData!, invitationHandler: ((Bool, MCSession!) -> Void)!) {
         
         println("AdvertiserDelegate:didReceiveInvitationFromPeer:\(peerID)")
+        
+        if (!peerAlreadyConnected(peerID))
+        {
+            // Makes the connection
+            invitationHandler(true, session);
+        }
     }
     
     //////////////////////////////////////////////////
@@ -213,11 +286,12 @@ class NetKit: NSObject, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowse
         
     }
     
-    func browser(browser: MCNearbyServiceBrowser!, foundPeer peerID: MCPeerID!, withDiscoveryInfo info: [NSObject : AnyObject]!) {
+    func browser(browser:MCNearbyServiceBrowser!, foundPeer peerID: MCPeerID!, withDiscoveryInfo info: [NSObject : AnyObject]!) {
         
         println("BrowserDelegate:foundPeer peerID:\(peerID)")
         
-        browser.invitePeer(peerID, toSession:session, withContext:nil, timeout:30)
+        // Automatically invite every peer you see
+        serviceBrowser?.invitePeer(peerID, toSession:session, withContext:nil, timeout:30)
     }
     
     func browser(browser: MCNearbyServiceBrowser!, lostPeer peerID: MCPeerID!) {
@@ -230,7 +304,8 @@ class NetKit: NSObject, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowse
     // MCNearbyServiceBrowserDelegate
     //////////////////////////////////////////////////
     
-    // MCSessionState: {MCSessionStateConnecting, MCSessionStateConnected, MCSessionStateNotConected}
+    // MCSessionState: {0:MCSessionStateNotConected, 1:MCSessionStateConnecting, 2:MCSessionStateConnected}
+    // A (0) MCSessionStateNotConnected change occurs when a client disconnects, or when a browser's invitation times out
     func session(session: MCSession!, peer peerID: MCPeerID!, didChangeState state: MCSessionState)
     {
         println("Session:peer:\(peerID) didChangeState:\(state.rawValue)")
@@ -246,6 +321,7 @@ class NetKit: NSObject, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowse
             case MCSessionState.NotConnected:
                 delegate?.peerDisconnected(peerIDString)
             default:
+                println("Nothing to see here...")
                 break
         }
     }
@@ -267,11 +343,14 @@ class NetKit: NSObject, MCNearbyServiceAdvertiserDelegate, MCNearbyServiceBrowse
     
     func session(session: MCSession!, didReceiveCertificate certificate: [AnyObject]!, fromPeer peerID: MCPeerID!, certificateHandler: ((Bool) -> Void)!)
     {
-        // Unused
+        println("Session:didReceiveCertificate fromPeer: \(peerID)")
+        // Even though this method is listed as optional in the docs, if you leave it blank your peers CANNOT CONNECT. Great work there, Apple.
+        certificateHandler(true)
     }
     
     func session(session: MCSession!, didReceiveStream stream: NSInputStream!, withName streamName: String!, fromPeer peerID: MCPeerID!)
     {
+        println("Session:didReceiveStream withName: \(streamName) fromPeer: \(peerID)")
         // Unused
     }
     

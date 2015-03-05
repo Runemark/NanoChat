@@ -8,12 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		5B121038197487F2004C1E1D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B737893E1807617C0076A88C /* AppDelegate.m */; };
-		5B7F97071AA78618000BBBCE /* Advertiser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F97051AA78618000BBBCE /* Advertiser.swift */; };
-		5B7F97081AA78618000BBBCE /* Browser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F97061AA78618000BBBCE /* Browser.swift */; };
-		5B7F970D1AA78620000BBBCE /* PeerKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F970A1AA78620000BBBCE /* PeerKit.swift */; };
-		5B7F970E1AA78620000BBBCE /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F970B1AA78620000BBBCE /* Session.swift */; };
-		5B7F970F1AA78620000BBBCE /* Transceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F970C1AA78620000BBBCE /* Transceiver.swift */; };
-		5B7F97151AA78CD7000BBBCE /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F97141AA78CD7000BBBCE /* ConnectionManager.swift */; };
 		5B7F97181AA793C6000BBBCE /* NetKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F97171AA793C6000BBBCE /* NetKit.swift */; };
 		7A046D7919E84ED5004C4763 /* MainScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A046D7519E84C36004C4763 /* MainScene.swift */; };
 		7A97911819E631CD001FFC4D /* libcocos2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A9790FE19E62E40001FFC4D /* libcocos2d.a */; };
@@ -90,12 +84,6 @@
 		5B121013197483EE004C1E1D /* ic_launcher.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ic_launcher.png; sourceTree = "<group>"; };
 		5B121015197483EE004C1E1D /* ic_launcher.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ic_launcher.png; sourceTree = "<group>"; };
 		5B121034197485FE004C1E1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Platforms/iOS/Info.plist; sourceTree = "<group>"; };
-		5B7F97051AA78618000BBBCE /* Advertiser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Advertiser.swift; sourceTree = "<group>"; };
-		5B7F97061AA78618000BBBCE /* Browser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Browser.swift; sourceTree = "<group>"; };
-		5B7F970A1AA78620000BBBCE /* PeerKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PeerKit.swift; sourceTree = "<group>"; };
-		5B7F970B1AA78620000BBBCE /* Session.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
-		5B7F970C1AA78620000BBBCE /* Transceiver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transceiver.swift; sourceTree = "<group>"; };
-		5B7F97141AA78CD7000BBBCE /* ConnectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
 		5B7F97171AA793C6000BBBCE /* NetKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetKit.swift; sourceTree = "<group>"; };
 		7A046D7519E84C36004C4763 /* MainScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MainScene.swift; path = Source/MainScene.swift; sourceTree = "<group>"; };
 		7A4036F419DE3FA8007B6E8F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/AppKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -210,19 +198,6 @@
 			path = "drawable-xxhdpi";
 			sourceTree = "<group>";
 		};
-		5B7F97161AA79001000BBBCE /* PeerKit Reference */ = {
-			isa = PBXGroup;
-			children = (
-				5B7F97051AA78618000BBBCE /* Advertiser.swift */,
-				5B7F97061AA78618000BBBCE /* Browser.swift */,
-				5B7F970A1AA78620000BBBCE /* PeerKit.swift */,
-				5B7F970B1AA78620000BBBCE /* Session.swift */,
-				5B7F970C1AA78620000BBBCE /* Transceiver.swift */,
-				5B7F97141AA78CD7000BBBCE /* ConnectionManager.swift */,
-			);
-			name = "PeerKit Reference";
-			sourceTree = "<group>";
-		};
 		7A9790F619E62E3F001FFC4D /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -249,7 +224,6 @@
 				B737893E1807617C0076A88C /* AppDelegate.m */,
 				7A046D7519E84C36004C4763 /* MainScene.swift */,
 				5B7F97171AA793C6000BBBCE /* NetKit.swift */,
-				5B7F97161AA79001000BBBCE /* PeerKit Reference */,
 				D352B48019EC608A00829775 /* MetalShaders */,
 			);
 			name = Source;
@@ -506,14 +480,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5B7F97181AA793C6000BBBCE /* NetKit.swift in Sources */,
-				5B7F970E1AA78620000BBBCE /* Session.swift in Sources */,
-				5B7F97081AA78618000BBBCE /* Browser.swift in Sources */,
-				5B7F970F1AA78620000BBBCE /* Transceiver.swift in Sources */,
-				5B7F97071AA78618000BBBCE /* Advertiser.swift in Sources */,
-				5B7F97151AA78CD7000BBBCE /* ConnectionManager.swift in Sources */,
 				B73789871807631A0076A88C /* main.m in Sources */,
 				7A046D7919E84ED5004C4763 /* MainScene.swift in Sources */,
-				5B7F970D1AA78620000BBBCE /* PeerKit.swift in Sources */,
 				5B121038197487F2004C1E1D /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
