@@ -39,6 +39,9 @@ public class Session: NSObject, MCSessionDelegate {
     // MARK: MCSessionDelegate
 
     public func session(session: MCSession!, peer peerID: MCPeerID!, didChangeState state: MCSessionState) {
+        
+        println("Session:peerID:\(peerID) didChangeState:\(state.rawValue)")
+        
         switch state {
             case .Connecting:
                 delegate?.connecting(myPeerID, toPeer: peerID)
@@ -50,6 +53,9 @@ public class Session: NSObject, MCSessionDelegate {
     }
 
     public func session(session: MCSession!, didReceiveData data: NSData!, fromPeer peerID: MCPeerID!) {
+        
+        println("Session:didReceiveData: \(data) fromPeer: \(peerID)")
+        
         delegate?.receivedData(myPeerID, data: data, fromPeer: peerID)
     }
 
@@ -62,6 +68,9 @@ public class Session: NSObject, MCSessionDelegate {
     }
 
     public func session(session: MCSession!, didFinishReceivingResourceWithName resourceName: String!, fromPeer peerID: MCPeerID!, atURL localURL: NSURL!, withError error: NSError!) {
+        
+        println("Session:didFinishReceivingResourceWithName: \(resourceName) fromPeer: \(peerID)")
+        
         if (error == nil) {
             delegate?.finishReceivingResource(myPeerID, resourceName: resourceName, fromPeer: peerID, atURL: localURL)
         }
