@@ -1,8 +1,7 @@
 import Foundation
 
-class MainScene: CCNode, NetKitDelegate, UITextFieldDelegate
+class MainScene: CCNode, UITextFieldDelegate
 {
-    var netkit:NetKit
     var info:DeviceInfo
     var interfaceUnit:Double
     
@@ -11,6 +10,7 @@ class MainScene: CCNode, NetKitDelegate, UITextFieldDelegate
     // Random Interface Stuff
     var nameField:UITextField
     var textInputHeight:Double
+    var chatButton:CCXSimpleButton
     
     override init()
     {
@@ -28,43 +28,41 @@ class MainScene: CCNode, NetKitDelegate, UITextFieldDelegate
         
         uiNode = CCNode()
         
+        chatButton = CCXSimpleButton(title:"Start Chat", fontSize:CGFloat(20.0))
+        chatButton.enableBackground()
+        chatButton.position = info.center
+        uiNode.addChild(chatButton)
+        
         // For now, we initialize this as a random display name. Eventually, the user will enter a name.
         let randomNumberString:String = String(Int(arc4random_uniform(100)))
         let displayName:String = "Derp" + randomNumberString
         
-        netkit = NetKit(displayName:displayName)
+        super.init()
+        
+        userInteractionEnabled = true
     }
     
     override func onEnter()
     {
-        
         // call this FIRST
         super.onEnter()
         
         // Remove obnoxious SpriteBuilder pregenerated scene content
         self.removeAllChildren()
         
-        println("onEnter")
-        
         self.addChild(uiNode)
-        
-        netkit.setDelegate(self)
-        netkit.startTransceiving(serviceType:"derp")
     }
     
     override func onEnterTransitionDidFinish() {
         
         // call this FIRST
         super.onEnterTransitionDidFinish()
-        println("onEnterTransitionDidFinish")
         
         addCenteredTextInputWithPlaceHolder("Screen Name", yPercent:(1-textInputHeight), textField:nameField)
     }
     
     override func onExitTransitionDidStart()
     {
-        
-        println("onExitTransitionDidStart")
         // call this LAST
         super.onExit()
     }
@@ -73,38 +71,69 @@ class MainScene: CCNode, NetKitDelegate, UITextFieldDelegate
     {
         nameField.removeFromSuperview()
         
-        println("onExit")
         // call this LAST
         super.onExit()
     }
     
-    /////////////////////////
-    // NetKit Delegate
-    /////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // Text Field Input
+    //////////////////////////////////////////////////////////////////////////////////////////
     
-    func peerDiscovered(peerIDString: String)
+    func textFieldShouldReturn(textField: UITextField) -> Bool
     {
-        println("PEER DISCOVERED: \(peerIDString)")
+        textField.resignFirstResponder()
+        return false
     }
     
-    func peerRequestFrom(peerIDString: String)
+    func getName() -> String
     {
-        println("PEER REQUEST FROM: \(peerIDString)")
+        var name:String = UIDevice.currentDevice().name
+        var fieldTextL:String = nameField.text
+        
+        if let fieldText:String = nameField.text
+        {
+            name = nameField.text
+        }
+        
+        return name
     }
     
-    func peerConnected(peerIDString:String)
+    //////////////////////////////
+    // Interactivity
+    //////////////////////////////
+    
+    override func touchBegan(touch: CCTouch!, withEvent event: CCTouchEvent!)
     {
-        println("PEER CONNECTED: \(peerIDString)")
+        
     }
     
-    func peerConnecting(peerIDString:String)
+    override func touchMoved(touch: CCTouch!, withEvent event: CCTouchEvent!)
     {
-        println("PEER CONNECTING: \(peerIDString)")
+        
     }
     
-    func peerDisconnected(peerIDString:String)
+    override func touchCancelled(touch: CCTouch!, withEvent event: CCTouchEvent!)
     {
-        println("PEER DISCONNECTED: \(peerIDString)")
+        
+    }
+    
+    override func touchEnded(touch: CCTouch!, withEvent event: CCTouchEvent!)
+    {
+        let uiTouchLocation:CGPoint = touch.locationInView(touch.view)
+        let ccTouchLocation:CGPoint = convertUILocToCC(uiTouchLocation)
+        
+        let buttonRect:CGRect = CGRectMake(chatButton.touchBounds.origin.x + chatButton.position.x, chatButton.touchBounds.origin.y + chatButton.position.y, chatButton.touchBounds.size.width, chatButton.touchBounds.size.height)
+        
+        if (chatButton.enabled && CGRectContainsPoint(buttonRect, ccTouchLocation))
+        {
+            let displayName:String = getName()
+            CCDirector.sharedDirector().replaceScene(ChatScene(displayName:displayName), withTransition:CCTransition(fadeWithDuration:0.5))
+        }
+    }
+    
+    func convertUILocToCC(uiTouchLocation:CGPoint) -> CGPoint
+    {
+        return CGPointMake(uiTouchLocation.x, info.view.height - uiTouchLocation.y)
     }
     
     //////////////////////////////
@@ -119,8 +148,6 @@ class MainScene: CCNode, NetKitDelegate, UITextFieldDelegate
         let textBracketWidth = textInputBoxHeight*0.625
         let approximateTotalBoxWidth = textInputBoxWidth + label_box_buffer + textBracketWidth
         let approximateSideWidth = Double((Double(info.view.width) - Double(approximateTotalBoxWidth))/2)
-        
-        println("interfaceUnit:\(interfaceUnit) tIBW:\(textInputBoxWidth) tIBH:\(textInputBoxHeight) l_b_b:\(label_box_buffer) tBW:\(textBracketWidth) appTBW:\(approximateTotalBoxWidth) appSW:\(approximateSideWidth)")
         
         textField.frame = CGRectMake(CGFloat(approximateSideWidth + label_box_buffer), CGFloat(info.view.height*CGFloat(yPercent)), CGFloat(textInputBoxWidth), CGFloat(textInputBoxHeight))
         textField.returnKeyType = UIReturnKeyType.Done
